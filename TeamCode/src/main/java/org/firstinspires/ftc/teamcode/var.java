@@ -11,6 +11,7 @@ public class var {
 
     public static float inWristIntaking = 0.5F; //LIKELY TO CHANGE
     public static float inWristTransfer = 0.25F;
+    public static float inWristSpit = 0.45F;
 
     public static float gateOpen = 0.1F;
     public static float gateClose = 0.35F;
