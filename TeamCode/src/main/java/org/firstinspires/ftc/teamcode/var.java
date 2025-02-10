@@ -9,27 +9,28 @@ public class var {
     public static float OuttakeTime = 0.3F;
     public static float OuttakeTime2 = 0.5F;
 
-    public static float inWristIntaking = 0.5F; //LIKELY TO CHANGE
-    public static float inWristTransfer = 0.25F;
-    public static float inWristSpit = 0.45F;
+    public static float inWristIntaking = 0.69F; //LIKELY TO CHANGE
+    public static float inWristTransfer = 0.87F;
+    public static float inWristSpit = 0.85F;
 
-    public static float gateOpen = 0.1F;
-    public static float gateClose = 0.35F;
+    public static float gateOpen = 0.05F;
+    public static float gateClose = 0.37F;
 
     //Bigger number - intake is lower
-    public static float inDown = 0.58F; //LIKELY TO CHANGE
-    public static float inTransfer = 0.05F;
-    public static float inIdle = 0.1F;
+    public static float inDown = 0.777F; //LIKELY TO CHANGE
+    public static float inTransfer = 0.4F;
+    public static float inIdle = 0.5F;
+    public static float inSpit = 0.7F;
 
     //Bigger number - arm is lower
     public static float armOut = 0.85F;
-    public static float armTransfer = 0.2F;
+    public static float armTransfer = 0.33F;
     public static float armSpec = 0.0F;
     public static float armSpecScore = 0.44F;
 
     //Bigger number - claw is open
     public static float clawClose = 0.63F;
-    public static float clawOpen = 0.45F;
+    public static float clawOpen = 0.50F;
     public static float clawOpenWide = 0.3F;
 
     //Bigger number - wrist goes out
@@ -40,10 +41,10 @@ public class var {
     public static float wristInit = 0F;
 
     //Slide Positions
-    public static float slideDeposit = 2000F;
-    public static float slideTransfer = 0F;
-    public static float slideSpecPickup = 500F;
-    public static float slideSpecScore = 1000F;
+    public static int slideDeposit = 2150;
+    public static int slideTransfer = 60;
+    public static int slideSpecPickup = 500;
+    public static int slideSpecScore = 850;
 
 
     // slide PID coefficients
