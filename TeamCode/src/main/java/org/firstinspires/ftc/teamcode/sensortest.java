@@ -120,7 +120,7 @@ public class sensortest extends OpMode {
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         inWrist = hardwareMap.get(Servo.class, "intakewrist");
         inWrist.setDirection(Servo.Direction.FORWARD);
-        inWrist.setPosition(var.inWristTransfer);
+        inWrist.setPosition(var1.inWristTransfer);
         outArm = hardwareMap.get(Servo.class, "outarm");
         outArm.setDirection(Servo.Direction.FORWARD);
 // outArm.setPosition(var.armTransfer);
@@ -129,16 +129,16 @@ public class sensortest extends OpMode {
 // wrist.setPosition(var.wristInit);
         gate = hardwareMap.get(Servo.class, "gate");
         gate.setDirection(Servo.Direction.FORWARD);
-        gate.setPosition(var.gateClose);
+        gate.setPosition(var1.gateClose);
         claw = hardwareMap.get(Servo.class, "claw");
         claw.setDirection(Servo.Direction.FORWARD);
 // claw.setPosition(var.clawOpen);
         leftIn = hardwareMap.get(Servo.class, "leftin");
         leftIn.setDirection(Servo.Direction.FORWARD);
-        leftIn.setPosition(var.inIdle);
+        leftIn.setPosition(var1.inIdle);
         rightIn = hardwareMap.get(Servo.class, "rightin");
         rightIn.setDirection(Servo.Direction.FORWARD);
-        rightIn.setPosition(var.inIdle);
+        rightIn.setPosition(var1.inIdle);
         horSlide = hardwareMap.get(DcMotor.class, "righthor");
         horSlide.setDirection(DcMotor.Direction.REVERSE);
         horSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

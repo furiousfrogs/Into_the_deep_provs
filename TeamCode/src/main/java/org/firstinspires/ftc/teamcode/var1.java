@@ -1,13 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-public class var {
-    //Time
-    public static float TransferATime = 0.7F;
-    public static float TransferBTime = 0.5F;
-    public static float TransferCTime = 0.3F;
-    public static float TransferDTime = 0.5F;
-    public static float OuttakeTime = 0.3F;
-    public static float OuttakeTime2 = 0.5F;
+public class var1 {
+
 
     public static float inWristIntaking = 0.69F; //LIKELY TO CHANGE
     public static float inWristTransfer = 0.87F;
@@ -17,7 +11,7 @@ public class var {
     public static float gateClose = 0.37F;
 
     //Bigger number - intake is lower
-    public static float inDown = 0.777F; //LIKELY TO CHANGE
+    public static float inDown = 0.773F; //LIKELY TO CHANGE
     public static float inTransfer = 0.4F;
     public static float inIdle = 0.5F;
     public static float inSpit = 0.7F;
@@ -29,6 +23,7 @@ public class var {
     public static float armSpecScore = 0.44F;
 
     //Bigger number - claw is open
+    public static float clawCloseTight = 0.066F;
     public static float clawClose = 0.63F;
     public static float clawOpen = 0.50F;
     public static float clawOpenWide = 0.3F;
@@ -41,10 +36,10 @@ public class var {
     public static float wristInit = 0F;
 
     //Slide Positions
-    public static int slideDeposit = 2150;
+    public static int slideDeposit = 2300;
     public static int slideTransfer = 60;
-    public static int slideSpecPickup = 500;
-    public static int slideSpecScore = 850;
+    public static int slideSpecPickup = 400;
+    public static int slideSpecScore = 960;
 
 
     // slide PID coefficients
