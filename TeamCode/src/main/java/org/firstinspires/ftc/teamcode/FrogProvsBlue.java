@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+
+
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;//importing libraries
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
@@ -13,8 +15,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
 
-@TeleOp(name = "FrogProvsDuoRed", group= "TeleOp")
-public class FrogProvsRed extends OpMode {
+
+
+@TeleOp(name = "FrogProvsDuoBlue", group= "TeleOp")
+public class FrogProvsBlue extends OpMode {
     RevBlinkinLedDriver.BlinkinPattern pattern;
 
     private DcMotor frontLeft, frontRight, backLeft, backRight;
@@ -22,15 +26,16 @@ public class FrogProvsRed extends OpMode {
     private DcMotor horSlide, vertSlideL, vertSlideR, intake;
 
     double lightsTimer;
-
+    boolean backToManual = false;
+    boolean resetIntake = false;
     boolean transferAction1 = false;
     private RevBlinkinLedDriver lights;
-
+    boolean resetHorOverride = false;
     boolean spitReset = false;
     boolean manualReset = false;
     private ElapsedTime  initTimer = new ElapsedTime();
 
-    double abortTimer, intakeTimer, transferTimer, outtakeTimer, specScoreTimer, specTimer2, specAbortTimer, spitTimer, resetTimer;
+    double abortTimer, intakeTimer, transferTimer, outtakeTimer, specScoreTimer, specTimer2, specAbortTimer, spitTimer, resetTimer, intakeTimer2;
 
     private ElapsedTime globalTimer = new ElapsedTime();
 
@@ -54,6 +59,10 @@ public class FrogProvsRed extends OpMode {
     private TouchSensor hortouch;
     private TouchSensor vertouch;
     boolean resethor = false;
+    double TransferStateWait=Double.MAX_VALUE;
+    double waitTransferDisplayer=Float.MAX_VALUE;
+    double resetHorWait =Double.MAX_VALUE;
+
     Gamepad currentGamepad1;
     Gamepad previousGamepad1;
     Gamepad currentGamepad2;
@@ -61,6 +70,7 @@ public class FrogProvsRed extends OpMode {
     public enum armState {
         armTransfering,
         armOuttaking,
+        armSpecDrop,
         armSpec,
         armSpecScore,
         armIdle;
@@ -156,39 +166,55 @@ public class FrogProvsRed extends OpMode {
         pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
 
     }
-    public void drive() {
-// double turnvar = Math.max(1, 1 + (horSlide.getCurrentPosition() / 1000.0));
-        boolean slow = gamepad1.options;
+    public void drive(){
+        //Taking input
         double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
         double rx = (gamepad1.right_trigger - gamepad1.left_trigger) ;
-        double slowvar = 2.0; // Slow mode divisor
-        double speedFactor = slow ? 1 / slowvar : 1;
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 0.8);
-// Denominator is the largest motor power (absolute value) or 1
-// This ensures all the powers maintain the same ratio,
-// but only if at least one is out of the range [-1, 1]
+
+        //Adjusting scale
+        if (x > -0.2 && x < 0.2) {
+            x = 0;
+        }
+        if (y > -0.2 && y < 0.2) {
+            y = 0;
+        }
+
+
+
+        double denominator=Math.max(Math.abs(y)+Math.abs(x)+Math.abs(rx),0.8);
+
+        double speedFactor = 0.5;
+        if (Math.abs(x) > 0.8 || Math.abs(y) > 0.8){
+            speedFactor = 2.0;
+        }
+
+
         double frontLeftPower = (y + x + rx) / denominator * speedFactor * 0.8;
         double backLeftPower = (y - x + rx) / denominator * speedFactor * 0.8;
         double frontRightPower = (y - x - rx) / denominator * speedFactor * 0.8;
         double backRightPower = (y + x - rx) / denominator * speedFactor * 0.8;
-// Normalize motor powers
+
+
+
         double maxPower = Math.max(Math.abs(frontLeftPower),
                 Math.max(Math.abs(frontRightPower),
                         Math.max(Math.abs(backLeftPower), Math.abs(backRightPower))));
+
         if (maxPower > 1.0) {
             frontLeftPower /= maxPower;
             frontRightPower /= maxPower;
             backLeftPower /= maxPower;
             backRightPower /= maxPower;
         }
+
         if (vertSlideL.getCurrentPosition() > 2000) {
             frontLeftPower = frontLeftPower/1.2;
             frontRightPower = frontRightPower/1.2;
             backLeftPower = backLeftPower/1.2;
             backRightPower = backRightPower/1.2;
         }
-// Set motor powers
+
         frontLeft.setPower(frontLeftPower);
         frontRight.setPower(frontRightPower);
         backLeft.setPower(backLeftPower);
@@ -239,13 +265,18 @@ public class FrogProvsRed extends OpMode {
             if (currentGamepad2.options && !previousGamepad2.options && !manualSlide) {
                 manualSlide = true;
             } else if (currentGamepad2.options && !previousGamepad2.options && manualSlide) {
+                manualSlide = false;
+                vertSlideL.setPower(1);
+                vertSlideL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                vertSlideR.setPower(1);
+                vertSlideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 vertSlideL.setTargetPosition(500);
                 vertSlideR.setTargetPosition(500);
                 claw.setPosition(var1.clawOpen);
                 outArm.setPosition(var1.armTransfer);
                 wrist.setPosition(var1.wristTransfer);
                 manualReset = true;
-                resetTimer = globalTimer.seconds() + 0.5;
+                resetTimer = globalTimer.seconds() + 0.3;
 
             }
             if (manualReset && globalTimer.seconds() > resetTimer) {
@@ -259,7 +290,6 @@ public class FrogProvsRed extends OpMode {
             double transferRed = transferColours.red;
             double transferGreen = transferColours.green;
             double transferBlue = transferColours.blue;
-            double waitTransferDisplayer=Float.MAX_VALUE;
             if(transferRed>0.3 ||transferGreen>0.3 ||transferBlue>0.3){
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
                 waitTransferDisplayer=globalTimer.seconds()+2;
@@ -284,8 +314,8 @@ public class FrogProvsRed extends OpMode {
                             currentArmState = armState.armTransfering;
                         } else if (currentGamepad2.triangle && !previousGamepad2.triangle) {
                             claw.setPosition(var1.clawClose);
-                            vertSlideL.setTargetPosition(1000);
-                            vertSlideR.setTargetPosition(1000);
+                            vertSlideL.setTargetPosition(var1.slideSpecPickup);
+                            vertSlideR.setTargetPosition(var1.slideSpecPickup);
                             specAction = true;
                         }
                         break;
@@ -297,8 +327,8 @@ public class FrogProvsRed extends OpMode {
                         }
                         if (currentGamepad2.triangle && !previousGamepad2.triangle) {
                             claw.setPosition(var1.clawClose);
-                            vertSlideL.setTargetPosition(1000);
-                            vertSlideR.setTargetPosition(1000);//TODO
+                            vertSlideL.setTargetPosition(var1.slideSpecPickup);
+                            vertSlideR.setTargetPosition(var1.slideSpecPickup);//TODO
                             specAction = true;
                         }
                         break;
@@ -306,11 +336,11 @@ public class FrogProvsRed extends OpMode {
                         if (currentGamepad2.circle && !previousGamepad2.circle) {
                             claw.setPosition(var1.clawOpen);
                             outtakeAction = true;
-                            outtakeTimer = globalTimer.seconds() + 0.2;
+                            outtakeTimer = globalTimer.seconds() + 0.4;
                         } else if (currentGamepad2.triangle && !previousGamepad2.triangle) { //unfinshed
                             claw.setPosition(var1.clawClose);
-                            vertSlideL.setTargetPosition(1000);
-                            vertSlideR.setTargetPosition(1000);//TODO
+                            vertSlideL.setTargetPosition(var1.slideSpecPickup);
+                            vertSlideR.setTargetPosition(var1.slideSpecPickup);//TODO
                             specAction = true;
                         }
                         if (outtakeAction && globalTimer.seconds() > outtakeTimer) {
@@ -327,9 +357,8 @@ public class FrogProvsRed extends OpMode {
                     case armSpec:
                         if (currentGamepad2.triangle && !previousGamepad2.triangle) {
                             claw.setPosition(var1.clawClose);
-                            vertSlideL.setTargetPosition(1000);
-                            vertSlideR.setTargetPosition(1000);//TODO
-                            specScoreTimer = globalTimer.seconds() + 0.3;
+
+                            specScoreTimer = globalTimer.seconds() + 0.5;
                             specScore = true;
                         }
 
@@ -345,13 +374,18 @@ public class FrogProvsRed extends OpMode {
                         if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper) {
                             outArm.setPosition(var1.armSpec);
                             wrist.setPosition(var1.wristSpec);
+                            vertSlideL.setTargetPosition(var1.slideSpecPickup);
+                            vertSlideR.setTargetPosition(var1.slideSpecPickup);//TODO
                             specAbort = true;
-                            specAbortTimer = globalTimer.seconds() + 0.3;
+                            specAbortTimer = globalTimer.seconds() + 0.5;
                         }
 
                         if (specAbort && globalTimer.seconds() > specAbortTimer) {
+                            vertSlideL.setTargetPosition(var1.slideSpecScore);
+                            vertSlideR.setTargetPosition(var1.slideSpecScore);//TODO
                             claw.setPosition(var1.clawOpenWide);
                             currentArmState = armState.armSpec;
+                            specAbort = false;
                         }
 
 
@@ -363,8 +397,8 @@ public class FrogProvsRed extends OpMode {
 
 
                 if (transferAction && globalTimer.seconds() > transferTimer) {
-                    vertSlideL.setTargetPosition(2150);
-                    vertSlideR.setTargetPosition(2150);//TODO
+                    vertSlideL.setTargetPosition(var1.slideDeposit);
+                    vertSlideR.setTargetPosition(var1.slideDeposit);//TODO
                     transferAction1 = true;
                     transferAction = false;
                 }
@@ -400,8 +434,8 @@ public class FrogProvsRed extends OpMode {
                 vertSlideR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 vertSlideR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
-            vertSlideL.setPower(-gamepad2.right_stick_y);
-            vertSlideR.setPower(-gamepad2.right_stick_y);
+            vertSlideL.setPower(-gamepad2.left_stick_y);
+            vertSlideR.setPower(-gamepad2.left_stick_y);
             if (gamepad2.right_bumper) {
                 outArm.setPosition(var1.armOut);
                 wrist.setPosition(var1.wristOut);
@@ -435,6 +469,7 @@ public class FrogProvsRed extends OpMode {
                     gate.setPosition(var1.gateOpen);
                     intake.setPower(1);
                     spitTimer = globalTimer.seconds() + 0.5;
+                    spit=false;
                 }
                 if (globalTimer.seconds() > spitTimer && spitReset) {
                     spitReset = false;
@@ -460,11 +495,15 @@ public class FrogProvsRed extends OpMode {
                     rightIn.setPosition(var1.inTransfer);
                     inWrist.setPosition(var1.inWristTransfer); // Set wrist to transfer position
 // Reset abort timer
+                    transfering = true;
                     resethor = true;
+                    resetHorWait = globalTimer.seconds() + 3;
+                    resetHorOverride = true;
                     intake.setPower(0.5);
                     eat = false;
                     currentTransferState = transferState.gateOpen;
                     currentIntakeState = intakeState.intakeTransfering;
+
 
                 }
                 break;
@@ -474,19 +513,32 @@ public class FrogProvsRed extends OpMode {
                 // Handle transfer state logic
                 switch (currentTransferState) {
                     case gateOpen:
-                        resethor = true;
-                        transfering = true;
-                        gate.setPosition(var1.gateOpen);
+
+
                         if (hortouch.isPressed()) { // Wait for touch sensor
                             intakeTimer = globalTimer.seconds() + 0.5;
+                            intake.setPower(1);
                             currentTransferState = transferState.spin; // Move to spin state
+                            TransferStateWait=Double.MAX_VALUE;
+                            resetIntake = true;
+                            transfering = true;
+                        } else if (!resethor) {
+                            transfering = false;
                         }
                         break;
                     case spin:
 
                         intake.setPower(1); // Spin intake
-                        if (globalTimer.seconds() > intakeTimer) {
-                            currentTransferState = transferState.idle; // Move to idle state
+                        if (resetIntake && globalTimer.seconds() > intakeTimer) {
+                            gate.setPosition(var1.gateOpen);
+                            intakeTimer2 = globalTimer.seconds() + 0.5;
+                            resetIntake = false;
+                            intakeTimer = Float.MAX_VALUE;
+
+                        }
+                        if (globalTimer.seconds() > intakeTimer2) {
+                            currentTransferState = transferState.idle;
+                            intakeTimer2 = Float.MAX_VALUE;
                         }
                         break;
                     case idle:
@@ -508,19 +560,12 @@ public class FrogProvsRed extends OpMode {
         double waitIn=Float.MAX_VALUE;
         if (currentIntakeState == intakeState.intaking) {
             if (intakeBlue > intakeGreen && intakeBlue > intakeRed) { //see blue
-                spit = true;
-                pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
-            } else {
-                spit = false;
-                pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
-            }
-            if (intakeRed > intakeGreen && intakeBlue < intakeRed) { //see red
-
                 eat = true;
+                pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
+            }else if ((intakeRed > intakeGreen) && (intakeRed > intakeBlue)) { //see red
+                spit = true;
                 pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
             } else {
-
-                eat = false;
                 pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
             }
         }
@@ -539,6 +584,10 @@ public class FrogProvsRed extends OpMode {
     public void resethor() {
         if (!hortouch.isPressed() && resethor) {
             horSlide.setPower(-1); // Move slide backwards
+            if (resetHorOverride && globalTimer.seconds() > resetHorWait) {
+                resethor = false;
+                resetHorOverride = false;
+            }
         } else if (hortouch.isPressed() && resethor) {
             horSlide.setPower(0); // Stop slide
             horSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -558,6 +607,7 @@ public class FrogProvsRed extends OpMode {
         telemetry.addData("transferstate", currentTransferState);
         telemetry.addData("vertslide mode", vertSlideR.getMode());
         telemetry.addData("transfer sensor",transferColour);
+        telemetry.addData("boolean spit:",spit);
         if (specMode) {
             telemetry.addLine("specmode");
         } else {
