@@ -19,6 +19,8 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 public class chuckscode extends OpMode {
     RevBlinkinLedDriver.BlinkinPattern pattern;
 
+
+    double intakeRed, intakeGreen, intakeBlue;
     private DcMotor frontLeft, frontRight, backLeft, backRight;
     private Servo leftIn, rightIn, wrist, outArm, claw, gate, inWrist;
     private DcMotor horSlide, vertSlideL, vertSlideR, intake;
@@ -34,11 +36,12 @@ public class chuckscode extends OpMode {
     private ElapsedTime  initTimer = new ElapsedTime();
 
     boolean specDrop = false;
-
-    double abortTimer, intakeTimer, transferTimer, outtakeTimer, specScoreTimer, specTimer2, specAbortTimer, spitTimer, resetTimer, intakeTimer2;
+    double spitTimer = Double.MAX_VALUE;
+    double abortTimer, intakeTimer, transferTimer, outtakeTimer, specScoreTimer, specTimer2, specAbortTimer, resetTimer, intakeTimer2;
     double humanTimer2=Double.MAX_VALUE;
     double humanTimer=Double.MAX_VALUE;
     double humanTimer5=Double.MAX_VALUE;
+    double humanTimer6=Double.MAX_VALUE;
     private ElapsedTime globalTimer = new ElapsedTime();
 
     boolean specMode = false;
@@ -308,17 +311,21 @@ public class chuckscode extends OpMode {
                             vertSlideL.setTargetPosition(var1.slideSpecPickup);
                             vertSlideR.setTargetPosition(var1.slideSpecPickup);
                             specAction = true;
+
+
+
                         } else if (currentGamepad2.square && !previousGamepad2.square) {
-                            if(specDrop){
-                                claw.setPosition(var1.clawClose);
-                                humanTimer2=globalTimer.seconds()+1.0;
-                            }
+
+                            claw.setPosition(var1.clawClose);
+                            humanTimer2=globalTimer.seconds()+1.0;
+                            currentArmState=armState.armSpecDrop;
+
 
                         }
                         break;
                     case armTransfering:
                         if (currentGamepad2.circle && !previousGamepad2.circle) {
-                            claw.setPosition(var1.clawClose);
+                            claw.setPosition(var1.clawCloseLoose);
                             transferAction = true;
                             transferTimer = globalTimer.seconds() + 0.2;
                         }
@@ -329,9 +336,9 @@ public class chuckscode extends OpMode {
                             specAction = true;
                         } else if (currentGamepad2.square && !previousGamepad2.square) {
 
-                                claw.setPosition(var1.clawClose);
-                                humanTimer2=globalTimer.seconds()+0.5;
-
+                            claw.setPosition(var1.clawClose);
+                            humanTimer2=globalTimer.seconds()+1.0;
+                            currentArmState=armState.armSpecDrop;
                         }
                         break;
                     case armOuttaking:
@@ -346,9 +353,9 @@ public class chuckscode extends OpMode {
                             specAction = true;
                         } else if (currentGamepad2.square && !previousGamepad2.square) {
 
-                                claw.setPosition(var1.clawClose);
-                                humanTimer2=globalTimer.seconds()+0.5;
-
+                            claw.setPosition(var1.clawClose);
+                            humanTimer2=globalTimer.seconds()+1.0;
+                            currentArmState=armState.armSpecDrop;
                         }
                         if (outtakeAction && globalTimer.seconds() > outtakeTimer) {
                             outArm.setPosition(var1.armTransfer);
@@ -397,6 +404,7 @@ public class chuckscode extends OpMode {
                         if (globalTimer.seconds() > specReset2) {
                             vertSlideL.setTargetPosition(var1.slideTransfer);
                             vertSlideR.setTargetPosition(var1.slideTransfer);
+                            specReset2 = Double.MAX_VALUE;
                             currentArmState = armState.armTransfering;
                         }
 
@@ -426,35 +434,56 @@ public class chuckscode extends OpMode {
                             currentArmState = armState.armIdle;
                         } break;
                     case armSpecDrop:
+                        if(globalTimer.seconds()>humanTimer2){
+                            vertSlideL.setTargetPosition(var1.slideSpecPickup);
+                            vertSlideR.setTargetPosition(var1.slideSpecPickup);
+                            humanTimer4=globalTimer.seconds()+0.5;
+                            humanTimer2=Double.MAX_VALUE;
+                        }
+                        if (globalTimer.seconds()>humanTimer4){
+                            outArm.setPosition(var1.armSpec);
+                            wrist.setPosition(var1.wristSpec);
+                            humanTimer4=Double.MAX_VALUE;
+                            humanTimer5=globalTimer.seconds()+0.5;
+                        }
+                        if(globalTimer.seconds()>humanTimer5){
+                            claw.setPosition(var1.clawOpenWide);
+                            humanTimer5=Double.MAX_VALUE;
+                        }
                         if (currentGamepad2.square && !previousGamepad2.square) {
-                            claw.setPosition(var1.clawClose);
-                            humanTimer2=globalTimer.seconds()+0.5;
 
+                            claw.setPosition(var1.clawClose);
+                            humanTimer6=globalTimer.seconds()+0.3;
+                        }
+
+                        if(globalTimer.seconds()>humanTimer6){
+                            outArm.setPosition(var1.armTransfer);
+                            wrist.setPosition(var1.wristTransfer);
+                            humanTimer=globalTimer.seconds()+0.5;
+                        }
+                        if(globalTimer.seconds()>=humanTimer){
+                            vertSlideL.setTargetPosition(var1.slideTransfer);
+                            vertSlideR.setTargetPosition(var1.slideTransfer);
+                            humanTimer=Double.MAX_VALUE;
+                            currentArmState=armState.armTransfering;
+
+                            vertSlideL.setTargetPosition(500);
+                            vertSlideR.setTargetPosition(500);
+                            outArm.setPosition(var1.armTransfer);
+                            wrist.setPosition(var1.wristTransfer);
+                            claw.setPosition(var1.clawOpen);
                         }
                 } //end of arm switch
 
-
-
-                if(globalTimer.seconds()>humanTimer2){
-                    outArm.setPosition(var1.armTransfer);
-                    wrist.setPosition(var1.wristTransfer);
-                    humanTimer4=globalTimer.seconds()+0.5;
-                    humanTimer2=Double.MAX_VALUE;
-
-                }
-                if(globalTimer.seconds()>=humanTimer4){
-                    vertSlideL.setTargetPosition(var1.slideTransfer);
-                    vertSlideR.setTargetPosition(var1.slideTransfer);
-                    claw.setPosition(var1.clawOpen);
-                    humanTimer4=Double.MAX_VALUE;
-                    currentArmState = armState.armTransfering;
-                }
 
                 if (transferAction && globalTimer.seconds() > transferTimer) {
                     vertSlideL.setTargetPosition(var1.slideDeposit);
                     vertSlideR.setTargetPosition(var1.slideDeposit);
                     transferAction1 = true;
                     transferAction = false;
+                }
+                if (transferAction1 && vertSlideL.getCurrentPosition() > 1000) {
+                    claw.setPosition(var1.clawCloseTight);
                 }
                 if (transferAction1 && vertSlideL.getCurrentPosition() > 1500) {
                     outArm.setPosition(var1.armOut);
@@ -470,24 +499,8 @@ public class chuckscode extends OpMode {
                     specAction2 = true;
                     specAction = false;
                 }
-                if(globalTimer.seconds()>humanTimer5){
-                    vertSlideL.setTargetPosition(var1.slideSpecPickup);
-                    vertSlideR.setTargetPosition(var1.slideSpecPickup);
-                    humanAction=true;
-                    humanTimer5=Double.MAX_VALUE;
-                }
-                if (humanAction && vertSlideL.getCurrentPosition()>350){
-                    outArm.setPosition(var1.armSpec);
-                    wrist.setPosition(var1.wristSpec);
-                    humanTimer=globalTimer.seconds()+0.5;
-                    humanAction=false;
-                    humanAction2=true;
-                }
-                if(humanAction2 && globalTimer.seconds()>humanTimer){
-                    claw.setPosition(var1.clawOpen);
-                    humanAction2=false;
-                    currentArmState = armState.armSpecDrop;
-                }
+
+
                 if (specAction2 && globalTimer.seconds() > specTimer2) {
                     claw.setPosition(var1.clawOpenWide);
                     currentArmState = armState.armSpec;
@@ -528,25 +541,22 @@ public class chuckscode extends OpMode {
                 break;
             case intaking:
 
-
-                if (!spit && !spitReset) {
-                    leftIn.setPosition(var1.inDown);
-                    rightIn.setPosition(var1.inDown);
-                    inWrist.setPosition(var1.inWristIntaking);
-                    gate.setPosition(var1.gateClose);
-                } else if (spit || spitReset) {
+                if ((intakeRed > intakeGreen && intakeBlue < intakeRed) && !spitReset) { //see red
                     spitReset = true;
-                    leftIn.setPosition(var1.inSpit);
-                    rightIn.setPosition(var1.inSpit);
+                    spitTimer = globalTimer.seconds() + 1;
                     inWrist.setPosition(var1.inWristSpit);
                     gate.setPosition(var1.gateOpen);
                     intake.setPower(1);
-                    spitTimer = globalTimer.seconds() + 0.5;
-                    spit=false;
-                }
-                if ((globalTimer.seconds() > spitTimer) && spitReset) {
+                } else if (globalTimer.seconds() > spitTimer && spitReset) {
+                    inWrist.setPosition(var1.inWristIntaking);
                     spitReset = false;
+                    spitTimer = Double.MAX_VALUE;
                 }
+                if (!spitReset) {
+                    inWrist.setPosition(var1.inWristIntaking);
+                    gate.setPosition(var1.gateClose);
+                }
+
 
                 if (gamepad2.left_trigger > 0.5) {
                     intake.setPower(-1);
@@ -562,12 +572,10 @@ public class chuckscode extends OpMode {
                 } else {
                     leftIn.setPosition(var1.inDown);
                     rightIn.setPosition(var1.inDown);
-                    inWrist.setPosition(var1.inWristIntaking);
-                    gate.setPosition(var1.gateClose);
                     intake.setPower(1);
                     // Normal intake
                 }
-                if ((currentGamepad2.cross && !previousGamepad2.cross) || (eat) && !spit) { // Start transfer
+                if ((currentGamepad2.cross && !previousGamepad2.cross) || (eat)) { // Start transfer
                     leftIn.setPosition(var1.inTransfer);
                     rightIn.setPosition(var1.inTransfer);
                     inWrist.setPosition(var1.inWristTransfer); // Set wrist to transfer position
@@ -626,10 +634,10 @@ public class chuckscode extends OpMode {
                 }
                 break;
         }
-            if (hortouch.isPressed() && horSlide.getCurrentPosition() != 0) {
-                horSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                horSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            }
+        if (hortouch.isPressed() && horSlide.getCurrentPosition() != 0) {
+            horSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            horSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
     }
 
     public void edibility() {
@@ -643,7 +651,6 @@ public class chuckscode extends OpMode {
                 eat = true;
                 pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
             }else if ((intakeRed > intakeGreen) && (intakeRed > intakeBlue)) { //see red
-                spit = true;
                 pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
             } else if  (manualSlide) {
                 pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
@@ -651,7 +658,7 @@ public class chuckscode extends OpMode {
                 pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
             }
         }
-        if(pattern!=pattern.previous()){
+        if((pattern!=pattern.previous()) && !manualSlide){
             lights.setPattern(pattern);
             waitIn=globalTimer.seconds()+3.0;
         }
@@ -670,7 +677,7 @@ public class chuckscode extends OpMode {
                 resetHorOverride = false;
             }
         } else if (hortouch.isPressed() && resethor) {
-            horSlide.setPower(0); // Stop slide
+            horSlide.setPower(-0.3); // Stop slide
             horSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             horSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             resethor = false; // Reset the flag
@@ -688,7 +695,7 @@ public class chuckscode extends OpMode {
         telemetry.addData("transferstate", currentTransferState);
         telemetry.addData("vertslide mode", vertSlideR.getMode());
         telemetry.addData("transfer sensor",transferColour);
-        telemetry.addData("boolean spit:",spit);
+        telemetry.addData("spitreset",spitReset);
         if (specMode) {
             telemetry.addLine("specmode");
         } else {
@@ -703,6 +710,11 @@ public class chuckscode extends OpMode {
             telemetry.addLine("manualslide");
         }
         telemetry.addData("hor power", horSlide.getPower());
+        telemetry.addData("red", intakeRed);
+        telemetry.addData("gree", intakeGreen);
+        telemetry.addData("blu", intakeBlue);
+
+
     }
     @Override
     public void loop () {

@@ -3,18 +3,18 @@ package org.firstinspires.ftc.teamcode;
 public class var1 {
 
 
-    public static float inWristIntaking = 0.69F; //LIKELY TO CHANGE
-    public static float inWristTransfer = 0.87F;
-    public static float inWristSpit = 0.85F;
+    public static float inWristIntaking = 0.63F; //LIKELY TO CHANGE
+    public static float inWristTransfer = 0.9F;
+    public static float inWristSpit = 0.9F;
 
     public static float gateOpen = 0.05F;
     public static float gateClose = 0.37F;
 
     //Bigger number - intake is lower
-    public static float inDown = 0.773F; //LIKELY TO CHANGE
-    public static float inTransfer = 0.4F;
-    public static float inIdle = 0.5F;
-    public static float inSpit = 0.7F;
+    public static float inDown = 0.8F; //LIKELY TO CHANGE
+    public static float inTransfer = 0.45F;
+    public static float inIdle = 0.8F;
+    public static float inSpit = 0.8F;
 
     //Bigger number - arm is lower
     public static float armOut = 0.85F;
@@ -27,7 +27,7 @@ public class var1 {
     public static float clawClose = 0.63F;
     public static float clawOpen = 0.50F;
     public static float clawOpenWide = 0.3F;
-
+    public static float clawCloseLoose=0.6F;
     //Bigger number - wrist goes out
     public static float wristTransfer = 0.2F;
     public static float wristOut = 0.9F;
