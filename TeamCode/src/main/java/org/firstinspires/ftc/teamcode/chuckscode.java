@@ -537,22 +537,15 @@ public class chuckscode extends OpMode {
                 break;
             case intaking:
 
-                if ((intakeRed > intakeGreen && intakeBlue < intakeRed) && !spitReset) { //see red
-                    spitReset = true;
-                    spitTimer = globalTimer.seconds() + 1;
+                if (spit) { //see red
                     inWrist.setPosition(var1.inWristSpit);
                     gate.setPosition(var1.gateOpen);
                     intake.setPower(1);
-                } else if (globalTimer.seconds() > spitTimer && spitReset) {
-                    inWrist.setPosition(var1.inWristIntaking);
-                    spitReset = false;
-                    spitTimer = Double.MAX_VALUE;
-                }
-                if (!spitReset) {
+                } else if (!spit && globalTimer.seconds()>spitTimer){
                     inWrist.setPosition(var1.inWristIntaking);
                     gate.setPosition(var1.gateClose);
+                    spitTimer = Double.MAX_VALUE;
                 }
-
 
                 if (gamepad2.left_trigger > 0.5) {
                     intake.setPower(-1);
@@ -645,16 +638,36 @@ public class chuckscode extends OpMode {
         if (currentIntakeState == intakeState.intaking) {
             if (intakeBlue > intakeGreen && intakeBlue > intakeRed) { //see blue
                 eat = true;
-                spit=false;
+                if(spit){
+                    spit=false;
+                    spitTimer=globalTimer.seconds()+0.2;
+                }
                 pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
             }else if ((intakeRed > intakeGreen) && (intakeRed > intakeBlue)) { //see red
                 pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
-                spit=true;
                 eat=false;
-            } else if  (manualSlide) {
+                spit=true;
+            }else if((intakeGreen>0.8)&&(intakeBlue<=0.6)){ //see yellow
+                eat=true;
+                if(spit){
+                    spit=false;
+                    spitTimer=globalTimer.seconds()+0.2;
+                }
+            }
+            else if  (manualSlide) {
                 pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+                eat=false;
+                if(spit){
+                    spit=false;
+                    spitTimer=globalTimer.seconds()+0.2;
+                }
             } else {
                 pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+                eat=false;
+                if(spit){
+                    spit=false;
+                    spitTimer=globalTimer.seconds()+0.2;
+                }
             }
         }
         if((pattern!=pattern.previous()) && !manualSlide){
