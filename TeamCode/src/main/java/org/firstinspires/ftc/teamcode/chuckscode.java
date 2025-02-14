@@ -317,14 +317,15 @@ public class chuckscode extends OpMode {
                         } else if (currentGamepad2.square && !previousGamepad2.square) {
 
                             claw.setPosition(var1.clawClose);
-                            humanTimer2=globalTimer.seconds()+1.0;
+                            humanTimer2=globalTimer.seconds()+0.5;
                             currentArmState=armState.armSpecDrop;
+
 
 
                         }
                         break;
                     case armTransfering:
-                        if (currentGamepad2.circle && !previousGamepad2.circle) {
+                        if (currentGamepad2.circle && !previousGamepad2.circle && (transferRed>0.6 ||transferBlue>0.6||transferGreen>0.6)) {
                             claw.setPosition(var1.clawCloseLoose);
                             transferAction = true;
                             transferTimer = globalTimer.seconds() + 0.2;
@@ -337,8 +338,9 @@ public class chuckscode extends OpMode {
                         } else if (currentGamepad2.square && !previousGamepad2.square) {
 
                             claw.setPosition(var1.clawClose);
-                            humanTimer2=globalTimer.seconds()+1.0;
+                            humanTimer2=globalTimer.seconds()+0.5;
                             currentArmState=armState.armSpecDrop;
+
                         }
                         break;
                     case armOuttaking:
@@ -354,8 +356,9 @@ public class chuckscode extends OpMode {
                         } else if (currentGamepad2.square && !previousGamepad2.square) {
 
                             claw.setPosition(var1.clawClose);
-                            humanTimer2=globalTimer.seconds()+1.0;
+                            humanTimer2=globalTimer.seconds()+0.5;
                             currentArmState=armState.armSpecDrop;
+
                         }
                         if (outtakeAction && globalTimer.seconds() > outtakeTimer) {
                             outArm.setPosition(var1.armTransfer);
@@ -389,7 +392,7 @@ public class chuckscode extends OpMode {
                             specScore = false;
                         }
 
-                        if (currentGamepad2.circle && !previousGamepad2.circle) {
+                        if (currentGamepad2.circle && !previousGamepad2.circle && (transferRed>0.6 ||transferBlue>0.6||transferGreen>0.6)) {
                             claw.setPosition(var1.clawClose);
                             specReset = globalTimer.seconds() + 0.5;
                             vertSlideL.setTargetPosition(var1.slideSpecPickup);
@@ -459,7 +462,8 @@ public class chuckscode extends OpMode {
                         if(globalTimer.seconds()>humanTimer6){
                             outArm.setPosition(var1.armTransfer);
                             wrist.setPosition(var1.wristTransfer);
-                            humanTimer=globalTimer.seconds()+0.5;
+                            humanTimer=globalTimer.seconds()+0.4;
+                            humanTimer6=Double.MAX_VALUE;
                         }
                         if(globalTimer.seconds()>=humanTimer){
                             vertSlideL.setTargetPosition(var1.slideTransfer);
@@ -467,11 +471,6 @@ public class chuckscode extends OpMode {
                             humanTimer=Double.MAX_VALUE;
                             currentArmState=armState.armTransfering;
 
-                            vertSlideL.setTargetPosition(500);
-                            vertSlideR.setTargetPosition(500);
-                            outArm.setPosition(var1.armTransfer);
-                            wrist.setPosition(var1.wristTransfer);
-                            claw.setPosition(var1.clawOpen);
                         }
                 } //end of arm switch
 
@@ -649,9 +648,12 @@ public class chuckscode extends OpMode {
         if (currentIntakeState == intakeState.intaking) {
             if (intakeBlue > intakeGreen && intakeBlue > intakeRed) { //see blue
                 eat = true;
+                spit=false;
                 pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
             }else if ((intakeRed > intakeGreen) && (intakeRed > intakeBlue)) { //see red
                 pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+                spit=true;
+                eat=false;
             } else if  (manualSlide) {
                 pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
             } else {
@@ -723,6 +725,5 @@ public class chuckscode extends OpMode {
         manualTake();
         Telemetry();
         resethor();
-
     }
 }
