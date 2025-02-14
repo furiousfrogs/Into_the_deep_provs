@@ -83,7 +83,8 @@ public class chuckscode extends OpMode {
         armSpecDrop,
         armSpec,
         armSpecScore,
-        armIdle;
+        armIdle,
+        armSpecAbort;
     }
     armState currentArmState = armState.armIdle;
     private enum intakeState {
@@ -418,17 +419,8 @@ public class chuckscode extends OpMode {
                             wrist.setPosition(var1.wristSpec);
                             vertSlideL.setTargetPosition(var1.slideSpecPickup);
                             vertSlideR.setTargetPosition(var1.slideSpecPickup);
-                            specAbort = true;
+                            currentArmState=armState.armSpecAbort;
                             specAbortTimer = globalTimer.seconds() + 0.5;
-                        }
-
-                        if (specAbort && globalTimer.seconds() > specAbortTimer) {
-                            claw.setPosition(var1.clawOpenWide);
-                            currentArmState = armState.armSpec;
-
-                            vertSlideL.setTargetPosition(var1.slideSpecPickup);
-                            vertSlideR.setTargetPosition(var1.slideSpecPickup);
-                            specAbort = false;
                         }
 
 
@@ -471,6 +463,11 @@ public class chuckscode extends OpMode {
                             humanTimer=Double.MAX_VALUE;
                             currentArmState=armState.armTransfering;
 
+                        }
+                    case armSpecAbort:
+                        if(globalTimer.seconds()>specAbortTimer){
+                            claw.setPosition(var1.clawOpenWide);
+                            currentArmState=armState.armSpec;
                         }
                 } //end of arm switch
 
