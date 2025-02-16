@@ -17,10 +17,11 @@ public class var1 {
     public static float inSpit = 0.8F;
 
     //Bigger number - arm is lower
-    public static float armOut = 0.85F;
-    public static float armTransfer = 0.33F;
-    public static float armSpec = 0.0F;
-    public static float armSpecScore = 0.44F;
+    public static float armOut = 0.98F;
+    public static float armTransfer = 0.46F;
+    public static float armSpec = 0.09F;
+    public static float armSpecScore = 0.57F;
+    public static float armInit = 0.4F;
 
     //Bigger number - claw is open
     public static float clawCloseTight = 0.066F;
@@ -33,7 +34,7 @@ public class var1 {
     public static float wristOut = 0.9F;
     public static float wristSpec = 0.2F;
     public static float wristSpecScore = 0.47F;
-    public static float wristInit = 0F;
+    public static float wristInit = 0.54F;
 
     //Slide Positions
     public static int slideDeposit = 2300;
