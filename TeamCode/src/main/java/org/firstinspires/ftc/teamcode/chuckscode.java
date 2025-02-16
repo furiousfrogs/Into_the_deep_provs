@@ -307,16 +307,22 @@ public class chuckscode extends OpMode {
                             vertSlideL.setTargetPosition(var1.slideTransfer);
                             vertSlideR.setTargetPosition(var1.slideTransfer);
                             currentArmState = armState.armTransfering;
-                        } else if (currentGamepad2.triangle && !previousGamepad2.triangle) {
+                        } else if (currentGamepad2.triangle && !previousGamepad2.triangle && (transferBlue+transferGreen+transferRed)>0.2) {
                             claw.setPosition(var1.clawClose);
                             vertSlideL.setTargetPosition(var1.slideSpecPickup);
                             vertSlideR.setTargetPosition(var1.slideSpecPickup);
                             specAction = true;
-                        } else if (currentGamepad2.square && !previousGamepad2.square) {
+
+
+
+                        } else if (currentGamepad2.square && !previousGamepad2.square&& (transferBlue+transferGreen+transferRed)>0.2) {
 
                             claw.setPosition(var1.clawClose);
                             humanTimer2=globalTimer.seconds()+0.5;
-                            currentArmState=armState.armSpecDrop;
+
+
+
+
                         }
                         break;
                     case armTransfering:
@@ -325,16 +331,17 @@ public class chuckscode extends OpMode {
                             transferAction = true;
                             transferTimer = globalTimer.seconds() + 0.2;
                         }
-                        if (currentGamepad2.triangle && !previousGamepad2.triangle) {
+                        if (currentGamepad2.triangle && !previousGamepad2.triangle &&(transferBlue+transferGreen+transferRed)>0.2) {
                             claw.setPosition(var1.clawClose);
                             vertSlideL.setTargetPosition(var1.slideSpecPickup);
                             vertSlideR.setTargetPosition(var1.slideSpecPickup);//TODO
                             specAction = true;
-                        } else if (currentGamepad2.square && !previousGamepad2.square) {
+                        } else if (currentGamepad2.square && !previousGamepad2.square&&(transferBlue+transferGreen+transferRed)>0.2) {
 
                             claw.setPosition(var1.clawClose);
                             humanTimer2=globalTimer.seconds()+0.5;
-                            currentArmState=armState.armSpecDrop;
+
+
                         }
                         break;
                     case armOuttaking:
@@ -342,16 +349,17 @@ public class chuckscode extends OpMode {
                             claw.setPosition(var1.clawOpen);
                             outtakeAction = true;
                             outtakeTimer = globalTimer.seconds() + 0.4;
-                        } else if (currentGamepad2.triangle && !previousGamepad2.triangle) { //unfinshed
+                        } else if (currentGamepad2.triangle && !previousGamepad2.triangle&&(transferBlue+transferGreen+transferRed)>0.2) { //unfinshed
                             claw.setPosition(var1.clawClose);
                             vertSlideL.setTargetPosition(var1.slideSpecPickup);
                             vertSlideR.setTargetPosition(var1.slideSpecPickup);//TODO
                             specAction = true;
-                        } else if (currentGamepad2.square && !previousGamepad2.square) {
+                        } else if (currentGamepad2.square && !previousGamepad2.square&&(transferBlue+transferGreen+transferRed)>0.2) {
 
                             claw.setPosition(var1.clawClose);
                             humanTimer2=globalTimer.seconds()+0.5;
-                            currentArmState=armState.armSpecDrop;
+
+
                         }
                         if (outtakeAction && globalTimer.seconds() > outtakeTimer) {
                             outArm.setPosition(var1.armTransfer);
@@ -406,7 +414,7 @@ public class chuckscode extends OpMode {
 
                         break;
                     case armSpecScore:
-                        if (currentGamepad2.right_bumper) {
+                        if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper) {
                             outArm.setPosition(var1.armSpec);
                             wrist.setPosition(var1.wristSpec);
                             vertSlideL.setTargetPosition(var1.slideSpecPickup);
@@ -422,7 +430,7 @@ public class chuckscode extends OpMode {
                         } break;
                     case armSpecDrop:
 
-                        if (currentGamepad2.square && !previousGamepad2.square) {
+                        if (currentGamepad2.square && !previousGamepad2.square &&(transferBlue+transferGreen+transferRed)>0.2) {
 
                             claw.setPosition(var1.clawClose);
                             humanTimer6=globalTimer.seconds()+0.4;
@@ -438,8 +446,7 @@ public class chuckscode extends OpMode {
                             vertSlideL.setTargetPosition(var1.slideTransfer);
                             vertSlideR.setTargetPosition(var1.slideTransfer);
                             humanTimer=Double.MAX_VALUE;
-                            currentArmState=armState.armIdle;
-                            currentArmState=armState.armSpecDrop;
+                            currentArmState=armState.armTransfering;
 
                         }
                     case armSpecAbort:
