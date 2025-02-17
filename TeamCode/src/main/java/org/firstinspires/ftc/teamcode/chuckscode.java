@@ -281,6 +281,7 @@ public class chuckscode extends OpMode {
                 manualSlide = false;
                 currentArmState = armState.armTransfering;
             }
+            double transferDistance=transferColour.getDistance();
             NormalizedRGBA transferColours = transferColour.getNormalizedColors();
             double transferRed = transferColours.red;
             double transferGreen = transferColours.green;
@@ -307,7 +308,7 @@ public class chuckscode extends OpMode {
                             vertSlideL.setTargetPosition(var1.slideTransfer);
                             vertSlideR.setTargetPosition(var1.slideTransfer);
                             currentArmState = armState.armTransfering;
-                        } else if (currentGamepad2.triangle && !previousGamepad2.triangle && (transferBlue+transferGreen+transferRed)>0.2) {
+                        } else if (currentGamepad2.triangle && !previousGamepad2.triangle && transferDistance >4.0) {
                             claw.setPosition(var1.clawClose);
                             vertSlideL.setTargetPosition(var1.slideSpecPickup);
                             vertSlideR.setTargetPosition(var1.slideSpecPickup);
@@ -315,7 +316,7 @@ public class chuckscode extends OpMode {
 
 
 
-                        } else if (currentGamepad2.square && !previousGamepad2.square&& (transferBlue+transferGreen+transferRed)>0.2) {
+                        } else if (currentGamepad2.square && !previousGamepad2.square&& transferDistance >4.0) {
 
                             claw.setPosition(var1.clawClose);
                             humanTimer2=globalTimer.seconds()+0.5;
@@ -326,17 +327,17 @@ public class chuckscode extends OpMode {
                         }
                         break;
                     case armTransfering:
-                        if (currentGamepad2.circle && !previousGamepad2.circle && (transferRed>0.1 || transferBlue>0.1 || transferGreen>0.1)) {
+                        if (currentGamepad2.circle && !previousGamepad2.circle && transferDistance >4.0) {
                             claw.setPosition(var1.clawCloseLoose);
                             transferAction = true;
                             transferTimer = globalTimer.seconds() + 0.2;
                         }
-                        if (currentGamepad2.triangle && !previousGamepad2.triangle &&(transferBlue+transferGreen+transferRed)>0.2) {
+                        if (currentGamepad2.triangle && !previousGamepad2.triangle) {
                             claw.setPosition(var1.clawClose);
                             vertSlideL.setTargetPosition(var1.slideSpecPickup);
                             vertSlideR.setTargetPosition(var1.slideSpecPickup);//TODO
                             specAction = true;
-                        } else if (currentGamepad2.square && !previousGamepad2.square&&(transferBlue+transferGreen+transferRed)>0.2) {
+                        } else if (currentGamepad2.square && !previousGamepad2.square && transferDistance >4.0) {
 
                             claw.setPosition(var1.clawClose);
                             humanTimer2=globalTimer.seconds()+0.5;
@@ -345,16 +346,16 @@ public class chuckscode extends OpMode {
                         }
                         break;
                     case armOuttaking:
-                        if (currentGamepad2.circle && !previousGamepad2.circle) {
+                        if (currentGamepad2.circle && !previousGamepad2.circle&&transferDistance >4.0) {
                             claw.setPosition(var1.clawOpen);
                             outtakeAction = true;
                             outtakeTimer = globalTimer.seconds() + 0.4;
-                        } else if (currentGamepad2.triangle && !previousGamepad2.triangle&&(transferBlue+transferGreen+transferRed)>0.2) { //unfinshed
+                        } else if (currentGamepad2.triangle && !previousGamepad2.triangle) { //unfinshed
                             claw.setPosition(var1.clawClose);
                             vertSlideL.setTargetPosition(var1.slideSpecPickup);
                             vertSlideR.setTargetPosition(var1.slideSpecPickup);//TODO
                             specAction = true;
-                        } else if (currentGamepad2.square && !previousGamepad2.square&&(transferBlue+transferGreen+transferRed)>0.2) {
+                        } else if (currentGamepad2.square && !previousGamepad2.square&&transferDistance >4.0) {
 
                             claw.setPosition(var1.clawClose);
                             humanTimer2=globalTimer.seconds()+0.5;
@@ -393,7 +394,7 @@ public class chuckscode extends OpMode {
                             specScore = false;
                         }
 
-                        if (currentGamepad2.circle && !previousGamepad2.circle && (transferRed>0.1 ||transferBlue>0.1||transferGreen>0.1)) {
+                        if (currentGamepad2.circle && !previousGamepad2.circle && transferDistance >4.0) {
                             claw.setPosition(var1.clawClose);
                             specReset = globalTimer.seconds() + 0.5;
                             vertSlideL.setTargetPosition(var1.slideSpecPickup);
@@ -430,7 +431,7 @@ public class chuckscode extends OpMode {
                         } break;
                     case armSpecDrop:
 
-                        if (currentGamepad2.square && !previousGamepad2.square &&(transferBlue+transferGreen+transferRed)>0.2) {
+                        if (currentGamepad2.square && !previousGamepad2.square) {
 
                             claw.setPosition(var1.clawClose);
                             humanTimer6=globalTimer.seconds()+0.4;
@@ -446,9 +447,8 @@ public class chuckscode extends OpMode {
                             vertSlideL.setTargetPosition(var1.slideTransfer);
                             vertSlideR.setTargetPosition(var1.slideTransfer);
                             humanTimer=Double.MAX_VALUE;
-                            currentArmState=armState.armTransfering;
-
-                        }
+                            currentArmState=armState.armIdle;
+                        }break;
                     case armSpecAbort:
                         if(globalTimer.seconds()>specAbortTimer){
                             claw.setPosition(var1.clawOpenWide);
@@ -551,7 +551,9 @@ public class chuckscode extends OpMode {
 
                 if (gamepad2.left_trigger > 0.5) {
                     intake.setPower(-1);
-                }
+                } else {
+intake.setPower(1); 
+}
 
 // Control intake power with the left bumper
                 if (gamepad2.left_bumper) {
@@ -563,7 +565,7 @@ public class chuckscode extends OpMode {
                 } else {
                     leftIn.setPosition(var1.inDown);
                     rightIn.setPosition(var1.inDown);
-                    intake.setPower(1);
+                    
                     // Normal intake
                 }
                 if ((currentGamepad2.cross && !previousGamepad2.cross) || (eat)) { // Start transfer
@@ -638,18 +640,18 @@ public class chuckscode extends OpMode {
         double intakeBlue = intakeColours.blue;
         double waitIn=Float.MAX_VALUE;
         if (currentIntakeState == intakeState.intaking) {
-            if (intakeBlue > intakeGreen && intakeBlue > intakeRed) { //see blue
+            if ((intakeBlue > intakeGreen && intakeBlue > intakeRed) && (intakeRed > 0.01 || intakeBlue > 0.01 || intakeGreen > 0.01)) { //see blue
                 eat = true;
                 if(spit){
                     spit=false;
                     spitTimer=globalTimer.seconds()+0.2;
                 }
                 pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
-            }else if ((intakeRed > intakeGreen) && (intakeRed > intakeBlue)) { //see red
+            }else if (((intakeRed > intakeGreen) && (intakeRed > intakeBlue)) && (intakeRed > 0.01 || intakeBlue > 0.01 || intakeGreen > 0.01)) { //see red
                 pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
                 eat=false;
                 spit=true;
-            }else if    (intakeRed > intakeBlue && intakeGreen > intakeBlue && (Math.abs(intakeRed - intakeGreen) < Math.abs(intakeBlue - intakeGreen)) && (Math.abs(intakeRed - intakeGreen) < Math.abs(intakeBlue - intakeRed))) { //see yellow
+            }else if    ((intakeRed > intakeBlue && intakeGreen > intakeBlue && (Math.abs(intakeRed - intakeGreen) < Math.abs(intakeBlue - intakeGreen)) && (Math.abs(intakeRed - intakeGreen) < Math.abs(intakeBlue - intakeRed))) && (intakeRed > 0.01 || intakeBlue > 0.01 || intakeGreen > 0.01)) { //see yellow
                 eat=true;
                 if(spit){
                     spit=false;
