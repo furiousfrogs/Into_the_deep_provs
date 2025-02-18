@@ -480,6 +480,12 @@ public class chuckscode extends OpMode {
                     transferAction1 = true;
                     transferAction = false;
                 }
+
+                if (transferAction1 && vertSlideL.getCurrentPosition() > 500) {
+                    outArm.setPosition(var1.armTransferOld);
+                    wrist.setPosition(var1.wristTransferOld);
+                }
+
                 if (transferAction1 && vertSlideL.getCurrentPosition() > 1000) {
                     claw.setPosition(var1.clawCloseTight);
                 }
@@ -552,22 +558,14 @@ public class chuckscode extends OpMode {
                 if (gamepad2.left_trigger > 0.5) {
                     intake.setPower(-1);
                 } else {
-intake.setPower(1); 
-}
+                    intake.setPower(1);
+                }
 
 // Control intake power with the left bumper
                 if (gamepad2.left_bumper) {
-                    leftIn.setPosition(var1.inSpit);
-                    rightIn.setPosition(var1.inSpit);
-                    inWrist.setPosition(var1.inWristSpit);
-                    gate.setPosition(var1.gateOpen);
-                    intake.setPower(1); // Reverse intake
-                } else {
-                    leftIn.setPosition(var1.inDown);
-                    rightIn.setPosition(var1.inDown);
-                    
-                    // Normal intake
+                    spit = true;
                 }
+                
                 if ((currentGamepad2.cross && !previousGamepad2.cross) || (eat)) { // Start transfer
                     leftIn.setPosition(var1.inTransfer);
                     rightIn.setPosition(var1.inTransfer);
@@ -581,8 +579,6 @@ intake.setPower(1);
                     eat = false;
                     currentTransferState = transferState.gateOpen;
                     currentIntakeState = intakeState.intakeTransfering;
-
-
                 }
                 break;
 
@@ -593,7 +589,7 @@ intake.setPower(1);
                     case gateOpen:
 
 
-                        if (hortouch.isPressed() || horSlide.getCurrentPosition() < 20) { // Wait for touch sensor
+                        if (hortouch.isPressed() || horSlide.getCurrentPosition() < 5) { // Wait for touch sensor
                             intakeTimer = globalTimer.seconds() + 0.5;
                             intake.setPower(1);
                             currentTransferState = transferState.spin; // Move to spin state
@@ -609,7 +605,7 @@ intake.setPower(1);
                         intake.setPower(1); // Spin intake
                         if (resetIntake && globalTimer.seconds() > intakeTimer) {
                             gate.setPosition(var1.gateOpen);
-                            intakeTimer2 = globalTimer.seconds() + 0.5;
+                            intakeTimer2 = globalTimer.seconds() + 1;
                             resetIntake = false;
                             intakeTimer = Float.MAX_VALUE;
 
@@ -640,18 +636,18 @@ intake.setPower(1);
         double intakeBlue = intakeColours.blue;
         double waitIn=Float.MAX_VALUE;
         if (currentIntakeState == intakeState.intaking) {
-            if ((intakeBlue > intakeGreen && intakeBlue > intakeRed) && (intakeRed > 0.01 || intakeBlue > 0.01 || intakeGreen > 0.01)) { //see blue
+            if ((intakeBlue > intakeGreen && intakeBlue > intakeRed) && ((intakeRed + intakeGreen + intakeBlue) >= 0.001)) { //see blue
                 eat = true;
                 if(spit){
                     spit=false;
                     spitTimer=globalTimer.seconds()+0.2;
                 }
                 pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
-            }else if (((intakeRed > intakeGreen) && (intakeRed > intakeBlue)) && (intakeRed > 0.01 || intakeBlue > 0.01 || intakeGreen > 0.01)) { //see red
+            }else if (((intakeRed > intakeGreen) && (intakeRed > intakeBlue)) && ((intakeRed + intakeGreen + intakeBlue) >= 0.001)) { //see red
                 pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
                 eat=false;
                 spit=true;
-            }else if    ((intakeRed > intakeBlue && intakeGreen > intakeBlue && (Math.abs(intakeRed - intakeGreen) < Math.abs(intakeBlue - intakeGreen)) && (Math.abs(intakeRed - intakeGreen) < Math.abs(intakeBlue - intakeRed))) && (intakeRed > 0.01 || intakeBlue > 0.01 || intakeGreen > 0.01)) { //see yellow
+            }else if    ((intakeRed > intakeBlue && intakeGreen > intakeBlue && (Math.abs(intakeRed - intakeGreen) < Math.abs(intakeBlue - intakeGreen)) && (Math.abs(intakeRed - intakeGreen) < Math.abs(intakeBlue - intakeRed))) && ((intakeRed + intakeGreen + intakeBlue) >= 0.001)) { //see yellow
                 eat=true;
                 if(spit){
                     spit=false;
