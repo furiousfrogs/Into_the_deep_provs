@@ -1,36 +1,46 @@
 package org.firstinspires.ftc.teamcode;
 
-public class var1 {
 
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
 
-    public static float inWristIntaking = 0.63F; //LIKELY TO CHANGE
-    public static float inWristTransfer = 0.9F;
-    public static float inWristSpit = 0.9F;
+@Config
+public class var {
 
-    public static float gateOpen = 0.05F;
-    public static float gateClose = 0.37F;
+public static float inWristIntakingAuto = 0.53F;
+    public static float inWristIntaking = 0.55F; //LIKELY TO CHANGE
+    public static float inWristTransfer = 0.65F;
+    public static float inWristSpit = 0.8F;
+
+    public static float inWristSpitAuto = 0.8F;
+
+    public static float gateOpen = 0.4F;
+    public static float gateClose = 0F;
 
     //Bigger number - intake is lower
-    public static float inDown = 0.8F; //LIKELY TO CHANGE
+    public static float inDownAuto = 0.79F;
+    public static float inDown = 0.84F; //LIKELY TO CHANGE
     public static float inTransfer = 0.45F;
-    public static float inIdle = 0.8F;
+    public static float inIdle = 0.6F;
     public static float inSpit = 0.8F;
+
 
     //Bigger number - arm is lower
     public static float armOut = 0.98F;
-    public static float armTransfer = 0.46F;
+    public static float armTransfer = 0.35F;
     public static float armSpec = 0.09F;
     public static float armSpecScore = 0.57F;
     public static float armInit = 0.4F;
 
     //Bigger number - claw is open
-    public static float clawCloseTight = 0.066F;
-    public static float clawClose = 0.63F;
-    public static float clawOpen = 0.50F;
-    public static float clawOpenWide = 0.3F;
-    public static float clawCloseLoose=0.6F;
+    public static float clawCloseTight = 0.71F;
+    public static float clawClose = 0.65F;
+    public static float clawOpen = 0.52F;
+    public static float clawOpenWide = 0.32F;
+    public static float clawCloseLoose=0.64F;
     //Bigger number - wrist goes out
-    public static float wristTransfer = 0.2F;
+    public static float wristTransfer = 0.34F;
     public static float wristOut = 0.9F;
     public static float wristSpec = 0.2F;
     public static float wristSpecScore = 0.47F;
@@ -38,9 +48,9 @@ public class var1 {
 
     //Slide Positions
     public static int slideDeposit = 2300;
-    public static int slideTransfer = 60;
+    public static int slideTransfer = 130;
     public static int slideSpecPickup = 400;
-    public static int slideSpecScore = 960;
+    public static int slideSpecScore = 920;
 
 
     // slide PID coefficients
@@ -50,6 +60,37 @@ public class var1 {
     public static double kF = 0.0; //Feedforward gain
     public static double maxIntegral = 800;
     public static double tolerance = 50;
+
+public static float spec1PickupHeading = 249F;
+    public static float spec2PickupHeading = 228.5F;
+    public static float spec3PickupHeading = 228F;
+
+
+public static int specPickupx1 = -45;
+    public static int specPickupx2 = -47;
+    public static float specPickupx3 = -52.6F;
+
+    public static float sampdrop1heading = 225F;
+    public static float sampdrop2heading = 225F;
+    public static float sampdrop3heading = 225F;
+
+    public static float samppickup1heading = 272F;
+    public static float samppickup2heading = 274F;
+    public static float samppickup3heading = 324F;
+
+    public static float sampdropx1 = 54F;
+    public static float sampdropx2 = 50F;
+    public static float sampdropx3 = 58F;
+
+    public static float sampdropy1 = 55F;
+    public static float sampdropy2 = 50F;
+    public static float sampdropy3 = 49F;
+
+    public static float samppickx1 = 45F;
+    public static float samppickx2 = 60.5F;
+
+
+
 
 
 
