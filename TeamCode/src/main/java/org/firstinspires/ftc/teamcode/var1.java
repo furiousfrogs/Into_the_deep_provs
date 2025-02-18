@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-
 import com.acmerobotics.dashboard.config.Config;
 
 
@@ -31,7 +30,7 @@ public class var1 {
     public static float armSpec = 0.09F;
     public static float armSpecScore = 0.57F;
     public static float armInit = 0.4F;
-public static float armTransferOld = 0.46F;
+    public static float armTransferOld = 0.46F;
     //Bigger number - claw is open
     public static float clawCloseTight = 0.71F;
     public static float clawClose = 0.65F;
