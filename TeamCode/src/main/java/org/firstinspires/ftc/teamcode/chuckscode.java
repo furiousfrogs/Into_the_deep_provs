@@ -14,6 +14,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 
 @TeleOp(name = "chuckscode", group= "TeleOp")
 public class chuckscode extends OpMode {
@@ -281,7 +283,7 @@ public class chuckscode extends OpMode {
                 manualSlide = false;
                 currentArmState = armState.armTransfering;
             }
-            double transferDistance=transferColour.getDistance();
+            double transferDistance=transferColour.getDistance(DistanceUnit.CM);
             NormalizedRGBA transferColours = transferColour.getNormalizedColors();
             double transferRed = transferColours.red;
             double transferGreen = transferColours.green;
